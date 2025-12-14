@@ -29,7 +29,7 @@ This guide will help you set up and run the Strategy BTC Dashboard locally.
 ### Step 1: Navigate to Project Directory
 
 ```bash
-cd /path/to/strategy-dashboard
+cd strategy-btc-dashboard
 ```
 
 ### Step 2: Install Dependencies
@@ -41,12 +41,9 @@ npm install
 This will install:
 - React and React DOM (UI framework)
 - Recharts (charting library)
+- Vite (build tool and dev server)
 - Vitest (testing framework)
 
-**Note:** If you encounter permission errors, try:
-```bash
-sudo npm install
-```
 
 ### Step 3: Verify Installation
 
@@ -57,128 +54,60 @@ npm list --depth=0
 
 Expected output:
 ```
-strategy-dashboard@3.0.0
+strategy-btc-dashboard@3.0.0
+├── @vitejs/plugin-react@5.1.2
 ├── react@18.2.0
 ├── react-dom@18.2.0
-└── recharts@2.10.0
+├── recharts@2.10.0
+├── vite@7.2.7
+└── vitest@4.0.15
 ```
 
 ## Running the Application
 
 ### Development Server
 
-Since this is a React application, you'll need a development server. There are several options:
+Start the Vite development server:
 
-#### Option 1: Using Create React App (Recommended)
-
-If you want a full development environment:
-
-```bash
-# Install Create React App globally (one-time)
-npm install -g create-react-app
-
-# Create a new React app
-npx create-react-app strategy-app
-
-# Copy our files into the src directory
-cp constants.js calculations.js api.js components.js StrategyDashboard.jsx strategy-app/src/
-
-# Navigate to the app directory
-cd strategy-app
-
-# Update src/index.js to render our dashboard
-```
-
-Then edit `src/index.js`:
-```javascript
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import StrategyDashboard from './StrategyDashboard';
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <StrategyDashboard />
-  </React.StrictMode>
-);
-```
-
-Start the development server:
-```bash
-npm start
-```
-
-The app will open at `http://localhost:3000`
-
-#### Option 2: Using Vite (Faster Alternative)
-
-```bash
-# Create a Vite project
-npm create vite@latest strategy-app -- --template react
-
-# Navigate to the project
-cd strategy-app
-
-# Install dependencies
-npm install
-
-# Copy our files
-cp ../constants.js ../calculations.js ../api.js ../components.js ../StrategyDashboard.jsx src/
-
-# Update src/main.jsx
-```
-
-Edit `src/main.jsx`:
-```javascript
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import StrategyDashboard from './StrategyDashboard'
-import './index.css'
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <StrategyDashboard />
-  </React.StrictMode>,
-)
-```
-
-Install Recharts:
-```bash
-npm install recharts
-```
-
-Start the development server:
 ```bash
 npm run dev
 ```
 
-The app will open at `http://localhost:5173`
+Expected output:
+```
+  VITE v7.2.7  ready in 500 ms
 
-#### Option 3: Simple HTML File (No Build Tool)
-
-Create an `index.html` file:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Strategy Dashboard</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel" src="strategy-dashboard-v3.jsx"></script>
-</body>
-</html>
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
 ```
 
-Open `index.html` in a web browser.
+Open your browser to `http://localhost:5173`
 
-**Note:** This method is simpler but not recommended for production.
+The dev server includes:
+- **Hot Module Replacement (HMR)** - Changes appear instantly
+- **React Fast Refresh** - Preserves component state during edits
+- **Detailed error overlay** - Clear error messages in the browser
+
+### Production Build
+
+Build optimized production assets:
+
+```bash
+npm run build
+```
+
+This creates a `dist/` directory with optimized, minified code.
+
+### Preview Production Build
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+Opens the production build at `http://localhost:4173`
 
 ## Running Tests
 
@@ -188,7 +117,16 @@ Open `index.html` in a web browser.
 npm test
 ```
 
-This will run both `calculations.test.js` and `api.test.js`.
+This runs both `calculations.test.js` and `api.test.js`.
+
+Expected output:
+```
+✓ tests/calculations.test.js (25 tests) 150ms
+✓ tests/api.test.js (12 tests) 89ms
+
+Test Files  2 passed (2)
+     Tests  37 passed (37)
+```
 
 ### Run Tests in Watch Mode
 
@@ -196,7 +134,7 @@ This will run both `calculations.test.js` and `api.test.js`.
 npm run test:watch
 ```
 
-Changes to test files or source files will automatically re-run affected tests.
+Tests automatically rerun when files change. Great for TDD workflow.
 
 ### Run Tests with Coverage
 
@@ -204,11 +142,7 @@ Changes to test files or source files will automatically re-run affected tests.
 npm run test:coverage
 ```
 
-This generates a coverage report showing:
-- Lines covered
-- Branches covered
-- Functions covered
-- Statements covered
+Generates a coverage report in the `coverage/` directory.
 
 Example output:
 ```
@@ -222,25 +156,13 @@ All files             |   85.23 |    78.45 |   90.12 |   86.34 |
 ----------------------|---------|----------|---------|---------|
 ```
 
-### Run Specific Test File
-
-```bash
-npm test calculations.test.js
-npm test api.test.js
-```
-
-### Debugging Tests
-
-Add `console.log()` statements in your tests or source code, then run:
-```bash
-npm test -- --verbose
-```
+Open `coverage/index.html` in your browser for detailed coverage visualization.
 
 ## Configuration
 
 ### API Keys
 
-The Polygon.io API key is stored in `constants.js`:
+The Polygon.io API key is stored in `src/constants.js`:
 
 ```javascript
 export const POLYGON_API_KEY = 'hhJDHpnbMIP1sFupse8YHfKgE_D84cyA';
@@ -249,40 +171,63 @@ export const POLYGON_API_KEY = 'hhJDHpnbMIP1sFupse8YHfKgE_D84cyA';
 **To use your own API key:**
 1. Sign up at https://polygon.io/ (free tier: 5 calls/min)
 2. Copy your API key
-3. Replace the value in `constants.js`
+3. Replace the value in `src/constants.js`
+
+**Best practice for production:**
+Use environment variables instead:
+
+1. Create `.env` file in project root:
+```
+VITE_POLYGON_API_KEY=your_key_here
+```
+
+2. Update `src/constants.js`:
+```javascript
+export const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY || 'fallback_key';
+```
+
+3. Add `.env` to `.gitignore` (already done)
 
 ### Updating Financial Data
 
-Edit `constants.js` → `STATIC_DATA`:
+Edit `src/constants.js` → `STATIC_DATA`:
 
 ```javascript
 export const STATIC_DATA = {
   btcHoldings: 660624,  // Update this
-  basicSharesOutstanding: 300800,  // Update this
+  basicSharesOutstanding: 300800,  // Update this (in thousands)
+  usdReserve: 1440000000,  // Update this
   // ... etc
 };
 ```
 
 **Data Sources:**
-- Strategy's quarterly filings (10-Q, 10-K)
+- Strategy's quarterly filings (10-Q, 10-K) at https://www.sec.gov
 - Strategy's website: https://www.strategy.com
 - Bitcoin holdings: Usually announced via press release
+- Preferred stock details: Prospectus filings
 
 ## Project Structure
 
 ```
-strategy-dashboard/
-├── constants.js              # Configuration and static data
-├── calculations.js           # Business logic
-├── api.js                    # API fetching
-├── components.js             # React components
-├── StrategyDashboard.jsx     # Main app (refactored)
-├── strategy-dashboard-v3.jsx # Original file (preserved)
-├── calculations.test.js      # Tests for calculations
-├── api.test.js               # Tests for API functions
-├── package.json              # Dependencies
-├── PROJECT_STRUCTURE.md      # Architecture documentation
-└── SETUP.md                  # This file
+strategy-btc-dashboard/
+├── src/
+│   ├── main.jsx                # Entry point
+│   ├── StrategyDashboard.jsx   # Main app component
+│   ├── components.jsx          # UI components
+│   ├── calculations.js         # Business logic
+│   ├── api.js                  # API fetching
+│   └── constants.js            # Config and static data
+├── tests/
+│   ├── calculations.test.js    # Calculations tests
+│   └── api.test.js             # API tests
+├── coverage/                   # Test coverage reports
+├── dist/                       # Production build (generated)
+├── index.html                  # HTML entry point
+├── vite.config.js              # Vite configuration
+├── package.json                # Dependencies and scripts
+├── PROJECT_STRUCTURE.md        # Architecture documentation
+└── SETUP.md                    # This file
 ```
 
 ## Common Issues and Troubleshooting
@@ -290,6 +235,7 @@ strategy-dashboard/
 ### Issue: `npm: command not found`
 
 **Solution:** Node.js is not installed or not in PATH.
+
 ```bash
 # macOS with Homebrew
 brew install node
@@ -304,193 +250,224 @@ sudo apt-get install nodejs npm
 ### Issue: `Cannot find module 'react'`
 
 **Solution:** Dependencies not installed.
+
 ```bash
 npm install
 ```
 
-### Issue: Tests failing with "Cannot use import statement"
+If that doesn't work, try deleting `node_modules` and reinstalling:
 
-**Solution:** Ensure `package.json` has `"type": "module"`. The project uses Vitest which has native ES module support.
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
 
-The provided `package.json` already has this configured.
+### Issue: Port 5173 already in use
+
+**Solution:** Either close the other process or use a different port.
+
+```bash
+# Use a different port
+npm run dev -- --port 3000
+```
+
+Or find and kill the process:
+
+```bash
+# macOS/Linux
+lsof -ti:5173 | xargs kill
+
+# Windows
+netstat -ano | findstr :5173
+taskkill /PID <PID> /F
+```
 
 ### Issue: Polygon API errors in console
 
 **Possible Causes:**
+
 1. **Rate limit exceeded** - Free tier: 5 calls/min
    - Wait 60 seconds and refresh
-2. **Invalid API key** - Replace with your own in `constants.js`
-3. **Weekend/Market closed** - Polygon may not have data
+   - The app has built-in 500ms delays between calls
+
+2. **Invalid API key** - Replace with your own in `src/constants.js`
+
+3. **Weekend/Market closed** - Polygon may not have current data
    - Default values will be used
+   - App will still function
 
 ### Issue: CORS errors when fetching data
 
-**Solution:** This happens when running from `file://` protocol.
-- Use a local development server (Option 1 or 2 above)
-- Or use a browser extension to disable CORS (development only)
+**Solution:** This typically only happens in unusual setups. The Vite dev server handles CORS correctly.
 
-### Issue: Module resolution errors
+If you encounter CORS issues:
+- Ensure you're using `npm run dev` (not opening `index.html` directly)
+- Check browser console for specific error messages
+- Verify APIs are accessible from your network
 
-**Solution:** Ensure all imports use `.js` extension for ES modules:
-```javascript
-// Correct
-import { COLORS } from './constants.js';
+### Issue: Tests failing
 
-// Incorrect
-import { COLORS } from './constants';
+**Solution:** Ensure you're running tests from the project root:
+
+```bash
+# From project root
+npm test
+
+# Not from subdirectories
+cd tests  # DON'T DO THIS
+npm test  # Won't work
 ```
+
+If tests still fail, check:
+- Node version is 18.x or higher: `node --version`
+- All dependencies are installed: `npm install`
+
+### Issue: Build fails
+
+**Solution:** Check for syntax errors or missing imports.
+
+```bash
+# Run the build with verbose output
+npm run build
+
+# Check for TypeScript/linting errors
+# (This project uses plain JavaScript, so this is rare)
+```
+
+Common causes:
+- Missing imports
+- Typos in file names
+- Circular dependencies
 
 ## Development Workflow
 
 ### Making Changes
 
-1. **Edit source files** (`calculations.js`, `api.js`, etc.)
-2. **Update tests** if behavior changes
-3. **Run tests** to verify: `npm test`
-4. **Refresh browser** to see changes (or use hot reload)
+1. **Start dev server**: `npm run dev`
+2. **Edit source files** in `src/`
+3. **See changes instantly** in browser (HMR)
+4. **Update tests** if behavior changes
+5. **Run tests**: `npm test`
 
 ### Adding New Features
 
-1. **Update constants** if needed (new securities, data points)
-2. **Add calculation logic** in `calculations.js`
-3. **Write tests first** (TDD approach): `calculations.test.js`
-4. **Implement feature** until tests pass
-5. **Add UI component** in `components.js` if needed
-6. **Update main app** in `StrategyDashboard.jsx`
+Recommended TDD (Test-Driven Development) approach:
 
-### Test-Driven Development (TDD)
+1. **Write test first** in `tests/calculations.test.js` or `tests/api.test.js`
+2. **Run test** (should fail): `npm test`
+3. **Implement feature** in appropriate module
+4. **Run test** (should pass): `npm test`
+5. **Refactor** while keeping tests green
+6. **Update UI** in `StrategyDashboard.jsx` or `components.jsx`
 
-**Recommended approach for new features:**
+### Code Organization
 
-```bash
-# 1. Write failing test
-# Edit calculations.test.js, add test for new feature
+- **Constants/Config** → `src/constants.js`
+- **Business Logic** → `src/calculations.js`
+- **API Calls** → `src/api.js`
+- **UI Components** → `src/components.jsx`
+- **Main App** → `src/StrategyDashboard.jsx`
+- **Tests** → `tests/`
 
-# 2. Run test (should fail)
-npm test
+### Performance Tips
 
-# 3. Implement feature
-# Edit calculations.js
+**1. Use React DevTools**
+Install the React DevTools browser extension to inspect component renders.
 
-# 4. Run test (should pass)
-npm test
+**2. Check useMemo dependencies**
+The app uses `useMemo` to cache expensive calculations. Only add dependencies that actually affect results.
 
-# 5. Refactor if needed
-# Improve code while keeping tests green
-```
-
-## Performance Tips
-
-### Optimize Re-renders
-
-The app uses `useMemo` to cache expensive calculations:
+**3. Mock API calls during development**
+To avoid rate limits during development, temporarily mock API responses:
 
 ```javascript
-const waterfallResult = useMemo(() => {
-  return calculateWaterfall({...});
-}, [prices, treatItmAsEquity]);
+// In src/api.js
+const DEV_MODE = false; // Set to true during heavy development
+
+export async function fetchAllPricesSequentially() {
+  if (DEV_MODE) {
+    return {
+      btc: 100000,
+      mstr: 420,
+      eurUsd: 1.05,
+      STRF: { price: 100, avg10d: 100 },
+      // ... mock data
+    };
+  }
+  // ... real fetching
+}
 ```
-
-Only add dependencies that actually affect the calculation.
-
-### Reduce API Calls
-
-The app fetches prices on mount. To avoid repeated calls during development:
-
-1. **Mock the API** in development:
-   ```javascript
-   // In api.js, add at top:
-   const DEV_MODE = true;
-
-   export async function fetchAllPricesSequentially() {
-     if (DEV_MODE) {
-       return {
-         btc: 100000,
-         mstr: 420,
-         // ... mock data
-       };
-     }
-     // ... real fetching
-   }
-   ```
-
-2. **Use React DevTools** to inspect component updates
 
 ## Deployment
 
-### Build for Production
-
-Using Create React App:
-```bash
-npm run build
-```
-
-Using Vite:
-```bash
-npm run build
-```
-
-This creates an optimized production build in `dist/` or `build/`.
-
 ### Deploy to Netlify
 
+1. Install Netlify CLI:
 ```bash
-# Install Netlify CLI
 npm install -g netlify-cli
-
-# Deploy
-netlify deploy --prod --dir=build
 ```
+
+2. Build the project:
+```bash
+npm run build
+```
+
+3. Deploy:
+```bash
+netlify deploy --prod --dir=dist
+```
+
+Or connect your Git repository for automatic deployments.
 
 ### Deploy to Vercel
 
+1. Install Vercel CLI:
 ```bash
-# Install Vercel CLI
 npm install -g vercel
+```
 
-# Deploy
+2. Deploy:
+```bash
 vercel --prod
 ```
 
+Vercel automatically detects Vite and uses the correct build settings.
+
 ### Deploy to GitHub Pages
 
+1. Install gh-pages:
 ```bash
-# Install gh-pages
 npm install gh-pages --save-dev
-
-# Add to package.json scripts:
-# "deploy": "gh-pages -d build"
-
-# Deploy
-npm run deploy
 ```
 
-## Environment Variables
-
-For sensitive data (API keys), use environment variables:
-
-Create `.env` file:
+2. Add to `package.json` scripts:
+```json
+{
+  "scripts": {
+    "deploy": "vite build && gh-pages -d dist"
+  }
+}
 ```
-REACT_APP_POLYGON_API_KEY=your_key_here
-```
 
-Update `constants.js`:
+3. Configure base path in `vite.config.js`:
 ```javascript
-export const POLYGON_API_KEY = process.env.REACT_APP_POLYGON_API_KEY || 'default_key';
+export default defineConfig({
+  base: '/strategy-btc-dashboard/', // Your repo name
+  plugins: [react()],
+});
 ```
 
-**Note:** Don't commit `.env` to version control. Add to `.gitignore`:
-```
-.env
-.env.local
+4. Deploy:
+```bash
+npm run deploy
 ```
 
 ## Browser Support
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+- **Chrome** 90+
+- **Firefox** 88+
+- **Safari** 14+
+- **Edge** 90+
 
 **Not supported:**
 - Internet Explorer (ES modules not supported)
@@ -499,33 +476,48 @@ export const POLYGON_API_KEY = process.env.REACT_APP_POLYGON_API_KEY || 'default
 
 ### Documentation
 - See `PROJECT_STRUCTURE.md` for architecture details
-- Check comments in source files
+- Check inline comments in source files
 - Review test files for usage examples
 
-### Common Resources
+### External Resources
 - React docs: https://react.dev/
+- Vite docs: https://vitejs.dev/
 - Recharts docs: https://recharts.org/
 - Vitest docs: https://vitest.dev/
 
 ### Debugging
 
-Enable verbose logging:
+**Enable verbose logging:**
 ```javascript
-// In StrategyDashboard.jsx
-console.log('Prices:', prices);
-console.log('Waterfall Result:', waterfallResult);
+// In src/StrategyDashboard.jsx
+useEffect(() => {
+  async function loadPrices() {
+    console.log('Fetching prices...');
+    const result = await fetchAllPricesSequentially();
+    console.log('Prices fetched:', result);
+    // ...
+  }
+  loadPrices();
+}, []);
 ```
 
-Use React DevTools browser extension to inspect component state.
+**Use React DevTools:**
+Install the browser extension to:
+- Inspect component state
+- Track re-renders
+- Profile performance
+
+**Check the browser console:**
+All API errors and warnings appear in the browser console (F12 or Cmd+Option+I).
 
 ## Next Steps
 
-1. **Run the app** using one of the methods above
-2. **Explore the dashboard** - try toggling ITM converts
-3. **Review the code** - start with `StrategyDashboard.jsx`
-4. **Run tests** - `npm test`
-5. **Make changes** - update data in `constants.js`
-6. **Read documentation** - see `PROJECT_STRUCTURE.md`
+1. ✅ **Run the app**: `npm run dev`
+2. 📊 **Explore the dashboard** - Toggle ITM converts, view charts
+3. 🧪 **Run tests**: `npm test`
+4. 📖 **Read the code** - Start with `src/StrategyDashboard.jsx`
+5. 🔧 **Make changes** - Update data in `src/constants.js`
+6. 📚 **Read architecture docs** - See `PROJECT_STRUCTURE.md`
 
 ## License
 
@@ -533,5 +525,6 @@ MIT License - Feel free to use and modify as needed.
 
 ---
 
-**Last Updated:** December 13, 2025
-**Need Help?** Check the troubleshooting section above or review test files for examples.
+**Last Updated:** December 14, 2025  
+**Tech Stack:** React 18 + Vite 7 + Vitest 4 + Recharts 2  
+**Node Version:** 18.x or higher recommended
