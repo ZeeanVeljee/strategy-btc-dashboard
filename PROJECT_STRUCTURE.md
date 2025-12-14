@@ -1,12 +1,12 @@
-# Strategy Dashboard - Project Structure
+# Strategy BTC Dashboard - Project Structure
 
 ## Overview
 
-This document explains the structure of the Strategy Real BTC Per Share Dashboard project and details of the refactoring from a monolithic single-file architecture to a modular, maintainable codebase.
+This document explains the structure of the Strategy BTC Dashboard project and details of the refactoring from a monolithic single-file architecture to a modular, maintainable codebase.
 
 ## Project Purpose
 
-The Strategy Dashboard calculates the true Bitcoin (BTC) per share value for Strategy (MSTR) common shareholders after accounting for senior claims from:
+The Strategy BTC Dashboard calculates the true Bitcoin (BTC) per share value for Strategy (MSTR) common shareholders after accounting for senior claims from:
 - Convertible debt notes
 - Multiple classes of preferred stock (STRF, STRC, STRE, STRK, STRD)
 

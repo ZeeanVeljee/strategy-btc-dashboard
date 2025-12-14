@@ -1,8 +1,8 @@
-# Strategy Dashboard - Setup and Run Instructions
+# Strategy BTC Dashboard - Setup and Run Instructions
 
 ## Quick Start
 
-This guide will help you set up and run the Strategy Real BTC Per Share Dashboard locally.
+This guide will help you set up and run the Strategy BTC Dashboard locally.
 
 ## Prerequisites
 

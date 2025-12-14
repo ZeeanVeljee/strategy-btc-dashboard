@@ -1,7 +1,7 @@
 {
-  "name": "strategy-dashboard",
+  "name": "strategy-btc-dashboard",
   "version": "3.0.0",
-  "description": "Strategy Real BTC Per Share Dashboard - Calculates true BTC/share after senior claims",
+  "description": "Strategy BTC Dashboard - Calculates true BTC/share after senior claims",
   "type": "module",
   "scripts": {
     "dev": "vite",

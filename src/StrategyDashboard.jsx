@@ -221,7 +221,7 @@ export default function StrategyDashboard() {
           color: COLORS.btcOrange,
           margin: '0 0 4px 0',
         }}>
-          Strategy Real BTC Per Share Dashboard
+          Strategy BTC Dashboard
         </h1>
         <p style={{ fontSize: '11px', color: COLORS.textSecondary, margin: 0 }}>
           Calculating true BTC/share after senior claims (debt, preferred)
