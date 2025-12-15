@@ -73,15 +73,6 @@ Start the Vite development server:
 npm run dev
 ```
 
-Expected output:
-```
-  VITE v7.2.7  ready in 500 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-  ➜  press h + enter to show help
-```
-
 Open your browser to `http://localhost:5173`
 
 The dev server includes:
@@ -119,14 +110,6 @@ npm test
 
 This runs both `calculations.test.js` and `api.test.js`.
 
-Expected output:
-```
-✓ tests/calculations.test.js (25 tests) 150ms
-✓ tests/api.test.js (12 tests) 89ms
-
-Test Files  2 passed (2)
-     Tests  37 passed (37)
-```
 
 ### Run Tests in Watch Mode
 
@@ -144,17 +127,7 @@ npm run test:coverage
 
 Generates a coverage report in the `coverage/` directory.
 
-Example output:
-```
-----------------------|---------|----------|---------|---------|
-File                  | % Stmts | % Branch | % Funcs | % Lines |
-----------------------|---------|----------|---------|---------|
-All files             |   85.23 |    78.45 |   90.12 |   86.34 |
- calculations.js      |   92.15 |    85.71 |   95.00 |   93.21 |
- api.js               |   78.31 |    71.19 |   85.24 |   79.47 |
- constants.js         |  100.00 |   100.00 |  100.00 |  100.00 |
-----------------------|---------|----------|---------|---------|
-```
+
 
 Open `coverage/index.html` in your browser for detailed coverage visualization.
 
@@ -229,115 +202,6 @@ strategy-btc-dashboard/
 ├── PROJECT_STRUCTURE.md        # Architecture documentation
 └── SETUP.md                    # This file
 ```
-
-## Common Issues and Troubleshooting
-
-### Issue: `npm: command not found`
-
-**Solution:** Node.js is not installed or not in PATH.
-
-```bash
-# macOS with Homebrew
-brew install node
-
-# Windows
-# Download installer from nodejs.org
-
-# Linux (Ubuntu/Debian)
-sudo apt-get install nodejs npm
-```
-
-### Issue: `Cannot find module 'react'`
-
-**Solution:** Dependencies not installed.
-
-```bash
-npm install
-```
-
-If that doesn't work, try deleting `node_modules` and reinstalling:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### Issue: Port 5173 already in use
-
-**Solution:** Either close the other process or use a different port.
-
-```bash
-# Use a different port
-npm run dev -- --port 3000
-```
-
-Or find and kill the process:
-
-```bash
-# macOS/Linux
-lsof -ti:5173 | xargs kill
-
-# Windows
-netstat -ano | findstr :5173
-taskkill /PID <PID> /F
-```
-
-### Issue: Polygon API errors in console
-
-**Possible Causes:**
-
-1. **Rate limit exceeded** - Free tier: 5 calls/min
-   - Wait 60 seconds and refresh
-   - The app has built-in 500ms delays between calls
-
-2. **Invalid API key** - Replace with your own in `src/constants.js`
-
-3. **Weekend/Market closed** - Polygon may not have current data
-   - Default values will be used
-   - App will still function
-
-### Issue: CORS errors when fetching data
-
-**Solution:** This typically only happens in unusual setups. The Vite dev server handles CORS correctly.
-
-If you encounter CORS issues:
-- Ensure you're using `npm run dev` (not opening `index.html` directly)
-- Check browser console for specific error messages
-- Verify APIs are accessible from your network
-
-### Issue: Tests failing
-
-**Solution:** Ensure you're running tests from the project root:
-
-```bash
-# From project root
-npm test
-
-# Not from subdirectories
-cd tests  # DON'T DO THIS
-npm test  # Won't work
-```
-
-If tests still fail, check:
-- Node version is 18.x or higher: `node --version`
-- All dependencies are installed: `npm install`
-
-### Issue: Build fails
-
-**Solution:** Check for syntax errors or missing imports.
-
-```bash
-# Run the build with verbose output
-npm run build
-
-# Check for TypeScript/linting errors
-# (This project uses plain JavaScript, so this is rare)
-```
-
-Common causes:
-- Missing imports
-- Typos in file names
-- Circular dependencies
 
 ## Development Workflow
 
@@ -462,16 +326,6 @@ export default defineConfig({
 npm run deploy
 ```
 
-## Browser Support
-
-- **Chrome** 90+
-- **Firefox** 88+
-- **Safari** 14+
-- **Edge** 90+
-
-**Not supported:**
-- Internet Explorer (ES modules not supported)
-
 ## Getting Help
 
 ### Documentation
@@ -487,20 +341,6 @@ npm run deploy
 
 ### Debugging
 
-**Enable verbose logging:**
-```javascript
-// In src/StrategyDashboard.jsx
-useEffect(() => {
-  async function loadPrices() {
-    console.log('Fetching prices...');
-    const result = await fetchAllPricesSequentially();
-    console.log('Prices fetched:', result);
-    // ...
-  }
-  loadPrices();
-}, []);
-```
-
 **Use React DevTools:**
 Install the browser extension to:
 - Inspect component state
@@ -509,15 +349,6 @@ Install the browser extension to:
 
 **Check the browser console:**
 All API errors and warnings appear in the browser console (F12 or Cmd+Option+I).
-
-## Next Steps
-
-1. ✅ **Run the app**: `npm run dev`
-2. 📊 **Explore the dashboard** - Toggle ITM converts, view charts
-3. 🧪 **Run tests**: `npm test`
-4. 📖 **Read the code** - Start with `src/StrategyDashboard.jsx`
-5. 🔧 **Make changes** - Update data in `src/constants.js`
-6. 📚 **Read architecture docs** - See `PROJECT_STRUCTURE.md`
 
 ## License
 
