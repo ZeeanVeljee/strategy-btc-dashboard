@@ -1,38 +1,29 @@
 {
   "name": "strategy-btc-dashboard",
   "version": "3.0.0",
-  "description": "Strategy BTC Dashboard - Calculates BTC/share after senior claims",
+  "description": "Strategy BTC Dashboard - Monorepo with frontend and backend services",
   "type": "module",
   "scripts": {
-    "dev": "node dev.js",
+    "dev": "node scripts/dev.js",
     "dev:backend": "cd backend && node server.js",
-    "dev:frontend": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "build:backend": "echo 'Backend needs no build step'",
     "test": "npm run test:frontend && npm run test:backend",
-    "test:frontend": "vitest run",
-    "test:backend": "cd backend && vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
   "keywords": [
     "bitcoin",
     "strategy",
     "mstr",
     "capital-structure",
-    "financial-analysis"
+    "financial-analysis",
+    "monorepo"
   ],
   "author": "",
   "license": "MIT",
-  "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.2",
-    "concurrently": "^8.2.2",
-    "vite": "^7.2.7",
-    "vitest": "^4.0.15"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "recharts": "^2.10.0"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }

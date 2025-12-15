@@ -1,12 +1,22 @@
 # Dependencies
 node_modules/
+frontend/node_modules/
 backend/node_modules/
 
 # Build output
+frontend/dist/
 dist/
 
-#test coverage
+# Test coverage
+frontend/coverage/
+backend/coverage/
 coverage/
+
+# Old artifacts (can be deleted manually)
+/dist/
+/coverage/
+/node_modules/
+/package-lock.json
 
 # Environment variables
 .env

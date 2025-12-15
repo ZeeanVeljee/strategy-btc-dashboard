@@ -24,13 +24,13 @@ A real-time financial dashboard for analyzing Strategy's Bitcoin holdings and ca
 # 1. Clone or navigate to project directory
 cd strategy-btc-dashboard
 
-# 2. Install root dependencies
-npm install
+# 2. Install all dependencies (frontend and backend)
+npm run install:all
 
-# 3. Install backend dependencies
-cd backend && npm install && cd ..
+# Or install manually:
+# cd frontend && npm install && cd ../backend && npm install && cd ..
 
-# 4. Create backend environment file
+# 3. Create backend environment file
 cat > backend/.env << 'EOF'
 POLYGON_API_KEY=<API_KEY_HERE>
 PORT=3001
@@ -77,21 +77,21 @@ npm run dev:frontend
 ## Architecture
 
 ```
-Frontend (React + Vite)         Backend (Express + Cache)
-    Port 5173                        Port 3001
-         │                                │
-         │  GET /api/prices/all           │
-         ├────────────────────────────────>│
-         │                                │ Check cache
-         │                                │ (0.5ms response)
-         │  { btc, mstr, stocks, ... }    │
-         │<────────────────────────────────┤
-         │                                │
-         │                                │ Background scheduler
-         │                                │ refreshes cache every 30s
-         │                                │
-         │                                └──> External APIs
-         │                                     (CoinGecko, Polygon, etc.)
+┌─────────────────────────────────────────────────────────────┐
+│                      Monorepo Root                           │
+│                                                              │
+│  ┌────────────────────┐         ┌────────────────────┐     │
+│  │   frontend/        │         │   backend/         │     │
+│  │   (React + Vite)   │         │   (Express)        │     │
+│  │   Port 5173        │◄────────┤   Port 3001        │     │
+│  │                    │ /api/*  │   Cache Service    │     │
+│  └────────────────────┘  Proxy  └────────────────────┘     │
+│                                           │                  │
+│                                           │                  │
+│                                           ▼                  │
+│                                  External APIs               │
+│                            (CoinGecko, Polygon, etc.)        │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### How The Backend Works
@@ -103,33 +103,126 @@ Frontend (React + Vite)         Backend (Express + Cache)
 
 For more details, see [`backend/README.md`](backend/README.md).
 
+## Business Logic
+
+### Capital Structure Waterfall
+
+This dashboard calculates the **true Bitcoin per share** for Strategy (MSTR) common shareholders after accounting for senior claims. Unlike the simple "total BTC / total shares" calculation, this provides an accurate picture of common shareholder exposure.
+
+### Priority of Claims
+
+When Strategy's BTC holdings are liquidated, claims are satisfied in this order:
+
+1. **Convertible Debt** (unless in-the-money and treated as equity)
+   - Multiple tranches with different conversion prices and maturity dates
+   - If BTC price > conversion price, can be treated as equity dilution
+   
+2. **STRF** - Preferred Stock with dynamic liquidation preference
+   - Liquidation preference = 10-day VWAP of MSTR stock
+   - Adjusts based on market conditions
+   
+3. **STRC** - Preferred Stock with fixed $100 liquidation preference
+   
+4. **STRE** - Euro-denominated Preferred Stock
+   - Fixed €100 liquidation preference
+   - Converted to USD using EUR/USD exchange rate
+   
+5. **STRK** - Preferred Stock with dynamic preference and conversion
+   - Liquidation preference = 10-day VWAP of MSTR stock
+   - Converts to common if MSTR/10 > liquidation preference
+   
+6. **STRD** - Preferred Stock with fixed $100 liquidation preference
+   
+7. **Common Equity** - Residual BTC after all senior claims
+
+### Key Calculations
+
+**`calculateWaterfall()`** - Core calculation engine that:
+- Takes current BTC price, stock prices, and company data
+- Distributes BTC across the capital structure by priority
+- Calculates BTC/share for common equity
+- Returns detailed breakdown of all claims
+
+**`calculateCostOfCapital()`** - Annual cost analysis:
+- Dividend costs on preferred stock
+- Interest costs on convertible debt
+- Shows burden on USD reserve
+- Percentage of total BTC value
+
+**`calculateNavBleed()`** - Issuance discount analysis:
+- Difference between notional value and gross proceeds
+- Opportunity cost in BTC terms
+- Shows dilution impact on existing holders
+
+**`generateScenarioData()`** - Scenario modeling:
+- Runs waterfall across multiple BTC prices
+- Shows how senior claims % changes with BTC price
+- Identifies optimal price ranges for common shareholders
+
+### Interactive Features
+
+**ITM Converts Toggle:**
+- Toggle between treating in-the-money convertible notes as debt or equity
+- Shows impact on dilution and BTC/share
+- Helps model different liquidation scenarios
+
+**Real-time Data:**
+- BTC price from CoinGecko
+- MSTR and preferred stock prices from Polygon.io
+- EUR/USD exchange rate for STRE calculations
+- Sub-second cache response times via backend service
+
+### Use Cases
+
+1. **Valuation Analysis** - True BTC exposure per common share
+2. **Scenario Planning** - Impact of BTC price changes on shareholder value
+3. **Cost Tracking** - Annual dividend and interest burden
+4. **Dilution Analysis** - Effect of new preferred issuances
+5. **Capital Structure** - Visualization of claims priority
+
+For detailed module documentation, see [`frontend/README.md`](frontend/README.md).
+
 ## Project Structure
 
 ```
 strategy-btc-dashboard/
-├── backend/                   # Price caching service
-│   ├── server.js             # Express server
-│   ├── cache.js              # In-memory cache with TTL
-│   ├── priceService.js       # API fetching with backoff
-│   ├── scheduler.js          # Background cache refresh
-│   ├── rateLimiter.js        # Rate limit management
-│   ├── config.js             # Configuration
-│   ├── tests/                # Backend tests (unit + integration)
-│   └── README.md             # Backend documentation
-├── src/
-│   ├── main.jsx              # Entry point
-│   ├── StrategyDashboard.jsx # Main app component
-│   ├── components.jsx        # UI components
-│   ├── calculations.js       # Business logic
-│   ├── api.js                # API client (calls backend)
-│   └── constants.js          # Config and static data
-├── tests/
-│   ├── calculations.test.js  # Calculations tests
-│   └── api.test.js           # API tests
-├── vite.config.js            # Vite configuration (includes proxy)
-├── package.json              # Root dependencies and scripts
-└── README.md                 # This file
+├── frontend/                 # React application
+│   ├── src/
+│   │   ├── main.jsx         # Entry point
+│   │   ├── StrategyDashboard.jsx # Main app component
+│   │   ├── components.jsx   # UI components
+│   │   ├── calculations.js  # Business logic
+│   │   ├── api.js          # API client (calls backend)
+│   │   └── constants.js    # Config and static data
+│   ├── tests/
+│   │   ├── calculations.test.js # Calculations tests
+│   │   └── api.test.js     # API tests
+│   ├── index.html          # HTML entry point
+│   ├── vite.config.js      # Vite configuration (includes proxy)
+│   ├── package.json        # Frontend dependencies
+│   └── node_modules/
+├── backend/                 # Price caching service
+│   ├── server.js           # Express server
+│   ├── cache.js            # In-memory cache with TTL
+│   ├── priceService.js     # API fetching with backoff
+│   ├── scheduler.js        # Background cache refresh
+│   ├── rateLimiter.js      # Rate limit management
+│   ├── config.js           # Configuration
+│   ├── tests/              # Backend tests (unit + integration)
+│   ├── README.md           # Backend documentation
+│   ├── package.json        # Backend dependencies
+│   └── node_modules/
+├── scripts/
+│   └── dev.js              # Development server launcher
+├── package.json            # Root orchestrator
+├── README.md               # This file (overview + business logic)
+├── frontend/README.md      # Frontend architecture and development
+└── backend/README.md       # Backend service documentation
 ```
+
+**See Also:**
+- [`frontend/README.md`](frontend/README.md) - Frontend architecture, components, testing
+- [`backend/README.md`](backend/README.md) - Backend service, caching, API endpoints
 
 ## Running Tests
 
@@ -139,11 +232,11 @@ strategy-btc-dashboard/
 # Run all frontend tests
 npm run test:frontend
 
-# Watch mode (auto-rerun on changes)
-npm run test:watch
-
-# With coverage
-npm run test:coverage
+# Or from frontend directory
+cd frontend
+npm test              # Run tests once
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage
 ```
 
 ### Backend Tests
@@ -170,7 +263,12 @@ npm test:all
 npm test
 ```
 
-Runs both frontend and backend tests.
+Runs both frontend tests (~200ms) and backend unit tests (~1s). **Total: ~1-2 seconds.**
+
+For comprehensive backend tests (including slow and integration tests):
+```bash
+cd backend && npm test:all  # ~20 seconds
+```
 
 ## Configuration
 
@@ -182,7 +280,7 @@ POLYGON_API_KEY=your_key_here
 PORT=3001
 ```
 
-**Frontend:** The frontend now calls the backend API by default. For direct API access (fallback), edit `src/constants.js`:
+**Frontend:** The frontend now calls the backend API by default. For direct API access (fallback), edit `frontend/src/constants.js`:
 ```javascript
 export const POLYGON_API_KEY = 'your_key_here';
 ```
@@ -191,7 +289,7 @@ Get your free API key at https://polygon.io/ (free tier: 5 calls/min).
 
 ### Updating Financial Data
 
-Edit `src/constants.js` → `STATIC_DATA`:
+Edit `frontend/src/constants.js` → `STATIC_DATA`:
 
 ```javascript
 export const STATIC_DATA = {
@@ -214,13 +312,13 @@ export const STATIC_DATA = {
 # 1. Start dev servers (both frontend + backend)
 npm run dev
 
-# 2. Make code changes in src/ or backend/
+# 2. Make code changes in frontend/ or backend/
 #    - Frontend: Changes appear instantly (HMR)
 #    - Backend: Restart backend or use --watch flag
 
 # 3. Run tests (in another terminal)
-npm run test:watch          # Frontend tests
-cd backend && npm run test:watch  # Backend tests
+cd frontend && npm run test:watch  # Frontend tests
+cd backend && npm run test:watch   # Backend tests
 
 # 4. Before committing
 npm test                    # Run all tests
@@ -242,7 +340,7 @@ curl http://localhost:3001/api/prices/all?force=true
 ```
 
 **4. Mock API Calls During Heavy Development**
-Set `DEV_MODE = true` in `src/api.js` to use mock data and avoid rate limits.
+Set `DEV_MODE = true` in `frontend/src/api.js` to use mock data and avoid rate limits.
 
 ## Production Build
 
@@ -350,9 +448,9 @@ Wait 60s for the Polygon rate limit window to reset.
 
 ## Documentation
 
-- **Backend Details:** [`backend/README.md`](backend/README.md)
-- **Project Structure:** See "Project Structure" section above
-- **API Endpoints:** See [`backend/README.md`](backend/README.md#api-endpoints)
+- **Frontend:** [`frontend/README.md`](frontend/README.md) - Components, architecture, testing, deployment
+- **Backend:** [`backend/README.md`](backend/README.md) - Caching service, API endpoints, configuration
+- **Business Logic:** See "Business Logic" section above for capital structure calculations
 
 ## External Resources
 

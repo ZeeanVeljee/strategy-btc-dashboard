@@ -1,0 +1,34 @@
+{
+  "name": "strategy-btc-dashboard-frontend",
+  "version": "3.0.0",
+  "description": "Strategy BTC Dashboard - Frontend React Application",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "bitcoin",
+    "strategy",
+    "mstr",
+    "capital-structure",
+    "financial-analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "vite": "^7.2.7",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.0"
+  }
+}
+

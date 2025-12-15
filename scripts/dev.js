@@ -10,6 +10,7 @@ import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const rootDir = join(__dirname, '..');
 
 // ANSI colors for output
 const colors = {
@@ -22,7 +23,7 @@ function startProcess(name, command, args, color) {
   console.log(`${color}[${name}]${colors.reset} Starting: ${command} ${args.join(' ')}`);
   
   const child = spawn(command, args, {
-    cwd: __dirname,
+    cwd: rootDir,
     stdio: ['ignore', 'pipe', 'pipe'],
     shell: true
   });
