@@ -21,14 +21,14 @@ Create `.env` in this directory:
 ```bash
 # From project root
 cat > backend/.env << 'EOF'
-POLYGON_API_KEY=hhJDHpnbMIP1sFupse8YHfKgE_D84cyA
+POLYGON_API_KEY=<API_KEY_HERE>
 PORT=3001
 EOF
 ```
 
 Or manually create `backend/.env`:
 ```
-POLYGON_API_KEY=hhJDHpnbMIP1sFupse8YHfKgE_D84cyA
+POLYGON_API_KEY=<API_KEY_HERE>
 PORT=3001
 ```
 
