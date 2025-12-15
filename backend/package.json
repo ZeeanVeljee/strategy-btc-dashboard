@@ -1,0 +1,34 @@
+{
+  "name": "strategy-btc-backend",
+  "version": "1.0.0",
+  "description": "Price caching backend service for Strategy BTC Dashboard",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "vitest run tests/unit --reporter=verbose",
+    "test:slow": "vitest run tests/slow --reporter=verbose",
+    "test:integration": "vitest run tests/integration --reporter=verbose",
+    "test:all": "vitest run --reporter=verbose",
+    "test:watch": "vitest tests/unit",
+    "test:watch:slow": "vitest tests/slow",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "price-cache",
+    "api",
+    "bitcoin"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4",
+    "vitest": "^4.0.15"
+  }
+}

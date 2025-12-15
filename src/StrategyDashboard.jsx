@@ -8,7 +8,7 @@ import {
   calculateNavBleed,
   generateScenarioData,
 } from './calculations.js';
-import { fetchAllPricesSequentially } from './api.js';
+import { fetchAllPrices } from './api.js';
 import {
   Card,
   Metric,
@@ -133,7 +133,7 @@ export default function StrategyDashboard() {
 
   useEffect(() => {
     async function loadPrices() {
-      const result = await fetchAllPricesSequentially();
+      const result = await fetchAllPrices();
       if (result.btc && result.mstr) {
         setPrices({
           btc: result.btc,

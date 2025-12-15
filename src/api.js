@@ -1,6 +1,45 @@
 import { POLYGON_API_KEY } from './constants.js';
 
 /**
+ * Fetches all prices from backend caching service
+ * Falls back to direct API calls if backend is unavailable
+ * @param {boolean} force - Force refresh, bypass cache
+ * @returns {Promise<Object>} Object containing all fetched prices and errors
+ */
+export async function fetchAllPrices(force = false) {
+  try {
+    const backendUrl = '/api/prices/all' + (force ? '?force=true' : '');
+    const response = await fetch(backendUrl, {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(5000),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend returned ${response.status}: ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    
+    return {
+      btc: result.data.btc,
+      mstr: result.data.MSTR?.price,
+      eurUsd: result.data.eurUsd,
+      STRF: result.data.STRF,
+      STRC: result.data.STRC,
+      STRK: result.data.STRK,
+      STRD: result.data.STRD,
+      errors: result.errors || [],
+      successes: result.successes || [],
+      cached: result.metadata?.cached || false,
+      stale: result.metadata?.stale || false,
+    };
+  } catch (backendError) {
+    console.warn('[API] Backend unavailable, falling back:', backendError.message);
+    return await fetchAllPricesSequentially();
+  }
+}
+
+/**
  * Fetches the previous day's closing price for a ticker from Polygon API
  * @param {string} ticker - Stock ticker symbol
  * @returns {Promise<Object>} Price data or error object

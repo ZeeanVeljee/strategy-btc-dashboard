@@ -4,10 +4,14 @@
   "description": "Strategy BTC Dashboard - Calculates BTC/share after senior claims",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node dev.js",
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "vitest run",
+    "test:backend": "cd backend && vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
@@ -22,6 +26,7 @@
   "license": "MIT",
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.2",
+    "concurrently": "^8.2.2",
     "vite": "^7.2.7",
     "vitest": "^4.0.15"
   },
