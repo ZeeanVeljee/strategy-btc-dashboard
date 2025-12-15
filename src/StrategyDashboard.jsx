@@ -224,7 +224,7 @@ export default function StrategyDashboard() {
           Strategy BTC Dashboard
         </h1>
         <p style={{ fontSize: '11px', color: COLORS.textSecondary, margin: 0 }}>
-          Calculating true BTC/share after senior claims (debt, preferred)
+          Calculating BTC/share after senior claims (debt, preferred)
         </p>
         {errors.length > 0 && (
           <div style={{
@@ -249,7 +249,7 @@ export default function StrategyDashboard() {
       }}>
         <Card style={{ background: `linear-gradient(135deg, ${COLORS.cardBg}, rgba(247, 147, 26, 0.15))` }}>
           <Metric
-            label="Real BTC/Share"
+            label="BTC/Share"
             value={`${waterfallResult.satoshisPerShare.toLocaleString()} sats`}
             subValue={`₿${waterfallResult.btcPerShare.toFixed(8)}`}
             color={COLORS.btcOrange}
@@ -302,7 +302,7 @@ export default function StrategyDashboard() {
           />
         </Card>
         <Card style={{ padding: '12px' }}><Metric label="Residual BTC" value={formatBtc(waterfallResult.residualBtc)} /></Card>
-        <Card style={{ padding: '12px' }}><Metric label="Diluted Shares" value={`${(waterfallResult.totalCommonShares / 1e6).toFixed(1)}M`} /></Card>
+        <Card style={{ padding: '12px' }}><Metric label="Outstanding Shares" value={`${(waterfallResult.totalCommonShares / 1e6).toFixed(1)}M`} /></Card>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '12px', marginBottom: '16px' }}>
