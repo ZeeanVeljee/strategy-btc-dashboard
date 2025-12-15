@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { COLORS, STATIC_DATA } from './constants.js';
+import { STATIC_DATA } from './constants.js';
+import { useTheme } from './theme.jsx';
+import { ThemeToggle } from './ThemeToggle.jsx';
 import {
   formatNumber,
   formatBtc,
@@ -19,9 +21,9 @@ import {
   ScenarioTable,
 } from './components.jsx';
 
-const CostOfCapitalSection = ({ costData, btcPrice, btcHoldings, usdReserve }) => (
+const CostOfCapitalSection = ({ costData, btcPrice, btcHoldings, usdReserve, theme }) => (
   <Card>
-    <h3 style={{ color: COLORS.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
+    <h3 style={{ color: theme.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
       Cost of Capital (Annual)
     </h3>
     <Metric
@@ -29,7 +31,7 @@ const CostOfCapitalSection = ({ costData, btcPrice, btcHoldings, usdReserve }) =
       value={formatNumber(costData.totalAnnualCost)}
       subValue={`${((costData.totalAnnualCost / usdReserve) * 100).toFixed(1)}% of $1.44B reserve`}
       subValue2={`${((costData.totalAnnualCost / (btcHoldings * btcPrice)) * 100).toFixed(2)}% of BTC value`}
-      color={COLORS.red}
+      color={theme.red}
     />
     <div style={{ marginTop: '12px', fontSize: '10px' }}>
       {costData.breakdown.map(item => (
@@ -39,7 +41,7 @@ const CostOfCapitalSection = ({ costData, btcPrice, btcHoldings, usdReserve }) =
             display: 'flex',
             justifyContent: 'space-between',
             padding: '4px 0',
-            color: COLORS.textSecondary,
+            color: theme.textSecondary,
           }}
         >
           <span>{item.name} ({item.rate})</span>
@@ -50,9 +52,9 @@ const CostOfCapitalSection = ({ costData, btcPrice, btcHoldings, usdReserve }) =
   </Card>
 );
 
-const NavBleedSection = ({ navBleed, btcPrice }) => (
+const NavBleedSection = ({ navBleed, btcPrice, theme }) => (
   <Card>
-    <h3 style={{ color: COLORS.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
+    <h3 style={{ color: theme.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
       NAV Bleed (Preferred)
     </h3>
     <Metric
@@ -60,26 +62,26 @@ const NavBleedSection = ({ navBleed, btcPrice }) => (
       value={formatNumber(navBleed.totalBleed)}
       subValue={`${navBleed.bleedPct.toFixed(1)}% discount to par`}
       subValue2={formatBtc(navBleed.totalBleed / btcPrice) + ' opportunity cost'}
-      color={COLORS.red}
+      color={theme.red}
     />
-    <div style={{ marginTop: '8px', fontSize: '10px', color: COLORS.textSecondary }}>
+    <div style={{ marginTop: '8px', fontSize: '10px', color: theme.textSecondary }}>
       Notional: {formatNumber(navBleed.totalNotional)} • Proceeds: {formatNumber(navBleed.totalProceeds)}
     </div>
   </Card>
 );
 
-const ConvertiblesTable = ({ notes, mstrPrice }) => (
+const ConvertiblesTable = ({ notes, mstrPrice, theme }) => (
   <div style={{ overflowX: 'auto' }}>
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
       <thead>
-        <tr style={{ borderBottom: `1px solid ${COLORS.cardBorder}` }}>
-          <th style={{ textAlign: 'left', padding: '6px 4px', color: COLORS.textSecondary }}>Note</th>
-          <th style={{ textAlign: 'right', padding: '6px 4px', color: COLORS.textSecondary }}>Principal</th>
-          <th style={{ textAlign: 'right', padding: '6px 4px', color: COLORS.textSecondary }}>Coupon</th>
-          <th style={{ textAlign: 'right', padding: '6px 4px', color: COLORS.textSecondary }}>Conv Price</th>
-          <th style={{ textAlign: 'right', padding: '6px 4px', color: COLORS.textSecondary }}>Shares</th>
-          <th style={{ textAlign: 'right', padding: '6px 4px', color: COLORS.textSecondary }}>Status</th>
-          <th style={{ textAlign: 'right', padding: '6px 4px', color: COLORS.textSecondary }}>Moneyness</th>
+        <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+          <th style={{ textAlign: 'left', padding: '6px 4px', color: theme.textSecondary }}>Note</th>
+          <th style={{ textAlign: 'right', padding: '6px 4px', color: theme.textSecondary }}>Principal</th>
+          <th style={{ textAlign: 'right', padding: '6px 4px', color: theme.textSecondary }}>Coupon</th>
+          <th style={{ textAlign: 'right', padding: '6px 4px', color: theme.textSecondary }}>Conv Price</th>
+          <th style={{ textAlign: 'right', padding: '6px 4px', color: theme.textSecondary }}>Shares</th>
+          <th style={{ textAlign: 'right', padding: '6px 4px', color: theme.textSecondary }}>Status</th>
+          <th style={{ textAlign: 'right', padding: '6px 4px', color: theme.textSecondary }}>Moneyness</th>
         </tr>
       </thead>
       <tbody>
@@ -87,7 +89,7 @@ const ConvertiblesTable = ({ notes, mstrPrice }) => (
           const isItm = mstrPrice >= note.conversionPrice;
           const moneyness = ((mstrPrice / note.conversionPrice) - 1) * 100;
           return (
-            <tr key={note.name} style={{ borderBottom: `1px solid ${COLORS.cardBorder}` }}>
+            <tr key={note.name} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
               <td style={{ padding: '6px 4px' }}>{note.name}</td>
               <td style={{ textAlign: 'right', padding: '6px 4px', fontFamily: "'JetBrains Mono', monospace" }}>
                 {formatNumber(note.principal)}
@@ -104,7 +106,7 @@ const ConvertiblesTable = ({ notes, mstrPrice }) => (
               <td style={{
                 textAlign: 'right',
                 padding: '6px 4px',
-                color: isItm ? COLORS.green : COLORS.textSecondary,
+                color: isItm ? theme.green : theme.textSecondary,
                 fontWeight: isItm ? '600' : '400',
               }}>
                 {isItm ? 'ITM' : 'OTM'}
@@ -113,7 +115,7 @@ const ConvertiblesTable = ({ notes, mstrPrice }) => (
                 textAlign: 'right',
                 padding: '6px 4px',
                 fontFamily: "'JetBrains Mono', monospace",
-                color: moneyness > 0 ? COLORS.green : COLORS.red,
+                color: moneyness > 0 ? theme.green : theme.red,
               }}>
                 {moneyness > 0 ? '+' : ''}{moneyness.toFixed(1)}%
               </td>
@@ -126,6 +128,7 @@ const ConvertiblesTable = ({ notes, mstrPrice }) => (
 );
 
 export default function StrategyDashboard() {
+  const { theme } = useTheme();
   const [prices, setPrices] = useState({ btc: 100000, mstr: 420, eurUsd: 1.05 });
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState([]);
@@ -189,16 +192,17 @@ export default function StrategyDashboard() {
     return (
       <div style={{
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-        backgroundColor: COLORS.darkBg,
-        color: COLORS.textPrimary,
+        backgroundColor: theme.darkBg,
+        color: theme.textPrimary,
         minHeight: '100vh',
         padding: '20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}>
+        <ThemeToggle />
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '18px', color: COLORS.btcOrange }}>Loading prices...</div>
+          <div style={{ fontSize: '18px', color: theme.btcOrange }}>Loading prices...</div>
         </div>
       </div>
     );
@@ -207,23 +211,24 @@ export default function StrategyDashboard() {
   return (
     <div style={{
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      backgroundColor: COLORS.darkBg,
-      color: COLORS.textPrimary,
+      backgroundColor: theme.darkBg,
+      color: theme.textPrimary,
       minHeight: '100vh',
       padding: '20px',
       maxWidth: '1400px',
       margin: '0 auto',
     }}>
+      <ThemeToggle />
       <div style={{ marginBottom: '20px', textAlign: 'center' }}>
         <h1 style={{
           fontSize: '24px',
           fontWeight: '700',
-          color: COLORS.btcOrange,
+          color: theme.btcOrange,
           margin: '0 0 4px 0',
         }}>
           Strategy BTC Dashboard
         </h1>
-        <p style={{ fontSize: '11px', color: COLORS.textSecondary, margin: 0 }}>
+        <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>
           Calculating BTC/share after senior claims (debt, preferred)
         </p>
         {errors.length > 0 && (
@@ -231,10 +236,10 @@ export default function StrategyDashboard() {
             marginTop: '8px',
             padding: '8px',
             backgroundColor: 'rgba(248, 81, 73, 0.1)',
-            border: `1px solid ${COLORS.red}33`,
+            border: `1px solid ${theme.red}33`,
             borderRadius: '6px',
             fontSize: '10px',
-            color: COLORS.red,
+            color: theme.red,
           }}>
             API Errors: {errors.join(', ')}
           </div>
@@ -247,12 +252,12 @@ export default function StrategyDashboard() {
         gap: '12px',
         marginBottom: '16px',
       }}>
-        <Card style={{ background: `linear-gradient(135deg, ${COLORS.cardBg}, rgba(247, 147, 26, 0.15))` }}>
+        <Card style={{ background: `linear-gradient(135deg, ${theme.cardBg}, rgba(247, 147, 26, 0.15))` }}>
           <Metric
             label="BTC/Share"
             value={`${waterfallResult.satoshisPerShare.toLocaleString()} sats`}
             subValue={`₿${waterfallResult.btcPerShare.toFixed(8)}`}
-            color={COLORS.btcOrange}
+            color={theme.btcOrange}
             large
           />
         </Card>
@@ -261,7 +266,7 @@ export default function StrategyDashboard() {
             label="USD Value/Share"
             value={`$${waterfallResult.usdPerShare.toFixed(2)}`}
             subValue={`@ $${prices.btc.toLocaleString()} BTC`}
-            color={COLORS.green}
+            color={theme.green}
             large
           />
         </Card>
@@ -270,7 +275,7 @@ export default function StrategyDashboard() {
             label="Simple BTC/Share"
             value={`${simpleSatsPerShare.toLocaleString()} sats`}
             subValue="(Ignores cap structure)"
-            color={COLORS.textSecondary}
+            color={theme.textSecondary}
             large
           />
         </Card>
@@ -279,7 +284,7 @@ export default function StrategyDashboard() {
             label="Difference"
             value={`${differencePct.toFixed(1)}%`}
             subValue={`${difference > 0 ? '+' : ''}${difference.toLocaleString()} sats`}
-            color={difference < 0 ? COLORS.red : COLORS.green}
+            color={difference < 0 ? theme.red : theme.green}
             large
           />
         </Card>
@@ -307,27 +312,27 @@ export default function StrategyDashboard() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '12px', marginBottom: '16px' }}>
         <Card>
-          <h3 style={{ color: COLORS.textPrimary, marginBottom: '12px', fontSize: '13px', fontWeight: '600' }}>
+          <h3 style={{ color: theme.textPrimary, marginBottom: '12px', fontSize: '13px', fontWeight: '600' }}>
             Capital Structure
           </h3>
           <CapitalStructureChart data={waterfallResult.waterfall} btcHoldings={STATIC_DATA.btcHoldings} />
         </Card>
 
         <Card>
-          <h3 style={{ color: COLORS.textPrimary, marginBottom: '12px', fontSize: '13px', fontWeight: '600' }}>
+          <h3 style={{ color: theme.textPrimary, marginBottom: '12px', fontSize: '13px', fontWeight: '600' }}>
             Sats/Share & Senior % vs BTC Price
           </h3>
           <ScenarioChart data={scenarioData} currentBtcPrice={prices.btc} />
-          <div style={{ marginTop: '6px', fontSize: '9px', color: COLORS.textSecondary }}>
-            <span style={{ color: COLORS.btcOrange }}>━</span> Sats/Share &nbsp;
-            <span style={{ color: COLORS.red }}>┅</span> Senior Claims %
+          <div style={{ marginTop: '6px', fontSize: '9px', color: theme.textSecondary }}>
+            <span style={{ color: theme.btcOrange }}>━</span> Sats/Share &nbsp;
+            <span style={{ color: theme.red }}>┅</span> Senior Claims %
           </div>
         </Card>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px', marginBottom: '16px' }}>
         <Card>
-          <h3 style={{ color: COLORS.textPrimary, marginBottom: '12px', fontSize: '13px', fontWeight: '600' }}>
+          <h3 style={{ color: theme.textPrimary, marginBottom: '12px', fontSize: '13px', fontWeight: '600' }}>
             Capital Stack Detail
           </h3>
           <CapitalStackTable waterfall={waterfallResult.waterfall} />
@@ -339,9 +344,9 @@ export default function StrategyDashboard() {
               backgroundColor: 'rgba(63, 185, 80, 0.1)',
               borderRadius: '6px',
               fontSize: '10px',
-              border: `1px solid ${COLORS.green}33`,
+              border: `1px solid ${theme.green}33`,
             }}>
-              <span style={{ color: COLORS.green }}>✓</span> ITM converts as equity: {' '}
+              <span style={{ color: theme.green }}>✓</span> ITM converts as equity: {' '}
               {waterfallResult.inMoneyConverts.map(c => c.name.replace(' Convert', '')).join(', ')}
             </div>
           )}
@@ -349,14 +354,14 @@ export default function StrategyDashboard() {
           <div style={{
             marginTop: '12px',
             paddingTop: '12px',
-            borderTop: `1px solid ${COLORS.cardBorder}`,
+            borderTop: `1px solid ${theme.cardBorder}`,
           }}>
             <Toggle
               checked={treatItmAsEquity}
               onChange={(e) => setTreatItmAsEquity(e.target.checked)}
               label="Treat ITM converts as equity (adds to shares, removes from debt)"
             />
-            <div style={{ fontSize: '10px', color: COLORS.textSecondary, marginTop: '6px' }}>
+            <div style={{ fontSize: '10px', color: theme.textSecondary, marginTop: '6px' }}>
               {waterfallResult.inMoneyConverts.length} of {STATIC_DATA.convertibleNotes.length} converts ITM @ MSTR ${prices.mstr.toFixed(0)}
             </div>
           </div>
@@ -368,16 +373,18 @@ export default function StrategyDashboard() {
             btcPrice={prices.btc}
             btcHoldings={STATIC_DATA.btcHoldings}
             usdReserve={STATIC_DATA.usdReserve}
+            theme={theme}
           />
           <NavBleedSection
             navBleed={navBleed}
             btcPrice={prices.btc}
+            theme={theme}
           />
         </div>
       </div>
 
       <Card style={{ marginBottom: '16px' }}>
-        <h3 style={{ color: COLORS.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
+        <h3 style={{ color: theme.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
           Scenario Analysis: BTC Price Changes
         </h3>
         <ScenarioTable
@@ -391,18 +398,18 @@ export default function StrategyDashboard() {
       </Card>
 
       <Card style={{ marginBottom: '16px' }}>
-        <h3 style={{ color: COLORS.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
+        <h3 style={{ color: theme.textPrimary, marginBottom: '10px', fontSize: '13px', fontWeight: '600' }}>
           Convertible Notes Status
         </h3>
-        <ConvertiblesTable notes={STATIC_DATA.convertibleNotes} mstrPrice={prices.mstr} />
+        <ConvertiblesTable notes={STATIC_DATA.convertibleNotes} mstrPrice={prices.mstr} theme={theme} />
       </Card>
 
       <div style={{
         textAlign: 'center',
         padding: '12px',
-        color: COLORS.textSecondary,
+        color: theme.textSecondary,
         fontSize: '9px',
-        borderTop: `1px solid ${COLORS.cardBorder}`,
+        borderTop: `1px solid ${theme.cardBorder}`,
       }}>
         <p style={{ margin: '0 0 4px 0' }}>
           Data: Strategy.com (12/07/2025) • CoinGecko (BTC) • Polygon.io (stocks) • USD Reserve: $1.44B

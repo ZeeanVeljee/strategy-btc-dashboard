@@ -14,8 +14,8 @@ export default defineConfig({
   },
   test: {
     globals: false,
-    environment: 'node',
-    include: ['tests/**/*.test.js'],
+    environment: 'jsdom',
+    include: ['tests/**/*.test.{js,jsx}'],
   },
 });
 
