@@ -127,15 +127,20 @@ const ConvertiblesTable = ({ notes, mstrPrice }) => (
 
 export default function StrategyDashboard() {
   const [prices, setPrices] = useState({ btc: 100000, mstr: 420, eurUsd: 1.05 });
+  const [backendPrices, setBackendPrices] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState([]);
   const [treatItmAsEquity, setTreatItmAsEquity] = useState(true);
+  const [btcEdited, setBtcEdited] = useState(false);
+  const [mstrEdited, setMstrEdited] = useState(false);
+  const [btcInput, setBtcInput] = useState('100,000');
+  const [mstrInput, setMstrInput] = useState('420.00');
 
   useEffect(() => {
     async function loadPrices() {
       const result = await fetchAllPrices();
       if (result.btc && result.mstr) {
-        setPrices({
+        const basePrices = {
           btc: result.btc,
           mstr: result.mstr,
           eurUsd: result.eurUsd,
@@ -144,13 +149,118 @@ export default function StrategyDashboard() {
           STRK: result.STRK,
           STRD: result.STRD,
           STRE: result.STRE,
-        });
+        };
+        setPrices(basePrices);
+        setBackendPrices(basePrices);
+        setBtcEdited(false);
+        setMstrEdited(false);
+        setBtcInput(basePrices.btc.toLocaleString());
+        setMstrInput(basePrices.mstr.toFixed(2));
       }
       setErrors(result.errors);
       setLoading(false);
     }
     loadPrices();
   }, []);
+
+  const backendUnavailable = errors.some(e => e.startsWith('Backend unavailable'));
+
+  const parseNumericInput = (value) => {
+    const sanitized = value.replace(/[^0-9.]/g, '');
+    if (!sanitized) return NaN;
+    const num = Number(sanitized.replace(/,/g, ''));
+    return Number.isFinite(num) ? num : NaN;
+  };
+
+  const handleBtcInputChange = (e) => {
+    const value = e.target.value;
+    setBtcInput(value);
+    const num = parseNumericInput(value);
+    if (Number.isFinite(num) && num > 0) {
+      setPrices(prev => ({ ...prev, btc: num }));
+      setBtcEdited(true);
+    }
+  };
+
+  const handleMstrInputChange = (e) => {
+    const value = e.target.value;
+    setMstrInput(value);
+    const num = parseNumericInput(value);
+    if (Number.isFinite(num) && num > 0) {
+      setPrices(prev => ({ ...prev, mstr: num }));
+      setMstrEdited(true);
+    }
+  };
+
+  const revertBtcToLive = () => {
+    if (!backendPrices) return;
+    setPrices(prev => ({ ...prev, btc: backendPrices.btc }));
+    setBtcInput(backendPrices.btc.toLocaleString());
+    setBtcEdited(false);
+  };
+
+  const revertMstrToLive = () => {
+    if (!backendPrices) return;
+    setPrices(prev => ({ ...prev, mstr: backendPrices.mstr }));
+    setMstrInput(backendPrices.mstr.toFixed(2));
+    setMstrEdited(false);
+  };
+
+  const PriceStatusIcon = ({ color, edited, id }) => {
+    if (backendUnavailable) {
+      // Greyed-out circle with diagonal slash when backend is down
+      return (
+        <div style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          width: 14,
+          height: 14,
+          borderRadius: '50%',
+          border: `1px solid ${COLORS.textSecondary}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: 0.6,
+        }} data-testid={id ? `${id}-status-backend` : undefined}>
+          <div style={{
+            width: 12,
+            height: 1,
+            backgroundColor: COLORS.textSecondary,
+            transform: 'rotate(45deg)',
+          }} />
+        </div>
+      );
+    }
+
+    if (edited) {
+      // Small pencil icon to indicate manually edited value
+      return (
+        <div style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          fontSize: '11px',
+          color,
+        }} data-testid={id ? `${id}-status-edited` : undefined}>
+          ✎
+        </div>
+      );
+    }
+
+    // Live price: solid colored dot
+    return (
+      <div style={{
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        width: 8,
+        height: 8,
+        borderRadius: '50%',
+        backgroundColor: color,
+      }} data-testid={id ? `${id}-status-live` : undefined} />
+    );
+  };
 
   const waterfallResult = useMemo(() => {
     return calculateWaterfall({
@@ -291,8 +401,117 @@ export default function StrategyDashboard() {
         gap: '8px',
         marginBottom: '16px',
       }}>
-        <Card style={{ padding: '12px' }}><Metric label="BTC Price" value={`$${prices.btc.toLocaleString()}`} /></Card>
-        <Card style={{ padding: '12px' }}><Metric label="MSTR Price" value={`$${prices.mstr.toFixed(2)}`} /></Card>
+        <Card style={{ padding: '12px', position: 'relative' }}>
+          <PriceStatusIcon color={COLORS.btcOrange} edited={btcEdited} id="btc" />
+          <Metric
+            label="BTC Price"
+            value={
+              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', gap: 0 }}>
+                <span style={{ color: COLORS.textPrimary }}>$</span>
+                <input
+                  type="text"
+                  value={btcInput}
+                  onChange={handleBtcInputChange}
+                  onBlur={() => {
+                    const num = parseNumericInput(btcInput);
+                    if (Number.isFinite(num) && num > 0) {
+                      setBtcInput(num.toLocaleString());
+                    }
+                  }}
+                  style={{
+                    maxWidth: '90px',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: COLORS.textPrimary,
+                    font: 'inherit',
+                    textAlign: 'left',
+                  }}
+                />
+              </div>
+            }
+          />
+          {backendPrices && (
+            <div style={{ marginTop: '-4px', fontSize: '9px', textAlign: 'right' }}>
+              {!btcEdited ? (
+                <span style={{ color: COLORS.textSecondary }}>Live price</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={revertBtcToLive}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    color: COLORS.blue,
+                    cursor: 'pointer',
+                    fontSize: '9px',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Revert to live
+                </button>
+              )}
+            </div>
+          )}
+        </Card>
+        <Card style={{ padding: '12px', position: 'relative' }}>
+          <PriceStatusIcon color={COLORS.green} edited={mstrEdited} id="mstr" />
+          <Metric
+            label="MSTR Price"
+            value={
+              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline', gap: 0 }}>
+                <span style={{ color: COLORS.textPrimary }}>$</span>
+                <input
+                  type="text"
+                  value={mstrInput}
+                  onChange={handleMstrInputChange}
+                  onBlur={() => {
+                    const num = parseNumericInput(mstrInput);
+                    if (Number.isFinite(num) && num > 0) {
+                      setMstrInput(num.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }));
+                    }
+                  }}
+                  style={{
+                    maxWidth: '90px',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: COLORS.textPrimary,
+                    font: 'inherit',
+                    textAlign: 'left',
+                  }}
+                />
+              </div>
+            }
+          />
+          {backendPrices && (
+            <div style={{ marginTop: '-4px', fontSize: '9px', textAlign: 'right' }}>
+              {!mstrEdited ? (
+                <span style={{ color: COLORS.textSecondary }}>Live price</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={revertMstrToLive}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    color: COLORS.blue,
+                    cursor: 'pointer',
+                    fontSize: '9px',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Revert to live
+                </button>
+              )}
+            </div>
+          )}
+        </Card>
         <Card style={{ padding: '12px' }}><Metric label="Total BTC" value={`₿${STATIC_DATA.btcHoldings.toLocaleString()}`} /></Card>
         <Card style={{ padding: '12px' }}>
           <Metric
