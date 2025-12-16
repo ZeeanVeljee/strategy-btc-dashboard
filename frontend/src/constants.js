@@ -18,13 +18,13 @@ export const COLORS = {
 };
 
 export const STATIC_DATA = {
-  btcHoldings: 660624,
-  avgBtcCost: 74696,
-  totalBtcCostBasis: 49346000000,
-  usdReserve: 1440000000,
-  classAShares: 281160,
+  btcHoldings: 671268,
+  avgBtcCost: 74972,
+  totalBtcCostBasis: 50330000000,
+  usdReserve: 1448700000,
+  classAShares: 285950,
   classBShares: 19640,
-  basicSharesOutstanding: 300800,
+  basicSharesOutstanding: 305590,
   optionsOutstanding: 3667,
   rsuPsuUnvested: 1325,
 
@@ -81,15 +81,15 @@ export const STATIC_DATA = {
 
   preferredStock: {
     STRF: {
-      notional: 1268000000,
-      shares: 12680000,
+      notional: 1284300000,
+      shares: 12843306,
       dividendRate: 0.10,
       liqPref: 100,
       hasDynamicLiqPref: true,
       ticker: 'STRF',
       description: 'Senior Preferred (10%)',
       ipoPrice: 85,
-      grossProceeds: 1078000000,
+      grossProceeds: 1096000000,
     },
     STRC: {
       notional: 2959000000,
@@ -115,8 +115,8 @@ export const STATIC_DATA = {
       grossProceeds: 722000000,
     },
     STRK: {
-      notional: 1397000000,
-      shares: 13970000,
+      notional: 1397700000,
+      shares: 13977036,
       dividendRate: 0.08,
       liqPref: 100,
       hasDynamicLiqPref: true,
@@ -126,11 +126,11 @@ export const STATIC_DATA = {
       ticker: 'STRK',
       description: 'Convertible (8%, @$1000)',
       ipoPrice: 80,
-      grossProceeds: 1118000000,
+      grossProceeds: 1118600000,
     },
     STRD: {
-      notional: 1300000000,
-      shares: 13000000,
+      notional: 1402900000,
+      shares: 14029202,
       dividendRate: 0.10,
       liqPref: 100,
       hasDynamicLiqPref: false,
@@ -138,7 +138,7 @@ export const STATIC_DATA = {
       ticker: 'STRD',
       description: 'High-Yield (10% non-cum)',
       ipoPrice: 85,
-      grossProceeds: 1105000000,
+      grossProceeds: 1187200000,
     },
   },
 };
