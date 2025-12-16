@@ -280,12 +280,7 @@ POLYGON_API_KEY=your_key_here
 PORT=3001
 ```
 
-**Frontend:** The frontend now calls the backend API by default. For direct API access (fallback), edit `frontend/src/constants.js`:
-```javascript
-export const POLYGON_API_KEY = 'your_key_here';
-```
-
-Get your free API key at https://polygon.io/ (free tier: 5 calls/min).
+The frontend **never** calls external APIs like Polygon or CoinGecko directly. All external price fetching is done by the backend caching service, so `POLYGON_API_KEY` is only required on the backend.
 
 ### Updating Financial Data
 

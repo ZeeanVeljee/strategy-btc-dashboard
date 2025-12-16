@@ -1,5 +1,3 @@
-export const POLYGON_API_KEY = 'hhJDHpnbMIP1sFupse8YHfKgE_D84cyA';
-
 export const COLORS = {
   btcOrange: '#F7931A',
   btcOrangeDark: '#E8850F',

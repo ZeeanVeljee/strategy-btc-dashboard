@@ -89,7 +89,6 @@ User sees dashboard
 **Purpose:** Centralized configuration and static data.
 
 **Exports:**
-- `POLYGON_API_KEY` - API key for fallback direct API calls
 - `COLORS` - UI color scheme (Bitcoin orange theme with dark mode)
 - `STATIC_DATA` - Company financial data:
   - Bitcoin holdings (660,624 BTC as of 12/07/2025)
@@ -121,13 +120,7 @@ User sees dashboard
 
 **Key Functions:**
 
-1. **`fetchAllPrices(force)`** - Fetches all prices from backend `/api/prices/all`
-2. **`fetchAllPricesSequentially()`** - Fallback: direct API calls if backend is down
-3. **`fetchPolygonPrice(ticker)`** - Direct Polygon.io fetch (fallback only)
-4. **`fetchBtcPrice()`** - Direct CoinGecko fetch (fallback only)
-5. **`fetchEurUsdRate()`** - Direct ExchangeRate-API fetch (fallback only)
-
-**Backend First:** Always tries backend API first, falls back to direct calls if unavailable.
+1. **`fetchAllPrices(force)`** - Fetches all prices from backend `/api/prices/all`. If the backend is unavailable, it does **not** call external APIs directly; instead it returns safe default prices (e.g., BTC \$100k, MSTR \$420) plus an error message so the UI can still render.
 
 ### components.jsx
 
